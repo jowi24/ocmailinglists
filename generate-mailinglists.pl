@@ -112,7 +112,7 @@ foreach (@list) {
         my @list = get_list_from_api( "$api/users/$_", $user, $pass,
             '/ocs/data/email/text()' );
         my $email = $list[0];
-        $deliver .= "  deliver $email" . ( !$n ? "" : "\n" );
+        $deliver .= "  if \$header_from does not contain \"" . $email . "\" then deliver $email endif" . ( !$n ? "" : "\n" );
         $fromcheck .= "    \$header_from does contain \"$email\" "
           . ( !$n-- ? "" : "or\n" );
     }
