@@ -1,6 +1,6 @@
-# Owncloud mailinglist generator
+# Owncloud/Nextcloud mailinglist generator
 
-Generate an exim forward file to create mailing lists for each owncloud group.
+Generate an exim forward file to create mailing lists for each owncloud/nextcloud group.
 
 This perl script creates an exim forwardfile `$HOME/.forward`, based on the users and groups in an owncloud/nextcloud installation. It uses the [Owncloud User Provisioning API](https://doc.owncloud.org/server/8.0/admin_manual/configuration_user/user_provisioning_api.html) to access information about users and groups.
 
