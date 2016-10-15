@@ -118,7 +118,7 @@ foreach (@list) {
     }
 
     $result .=
-        "if\n  \$header_to contains \"$_\""
+        "if\n  \$original_local_part is \"$_\""
       . ( $_ ~~ @private ? " and \n  (\n$fromcheck\n  )" : "" )
       . "\nthen\n"
       . "$deliver\nendif\n\n";
