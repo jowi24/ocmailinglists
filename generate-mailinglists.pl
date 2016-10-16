@@ -23,6 +23,7 @@ sub usage {
       . "--host|-h <hostname>                \n"
       . "[--catch-all <email>]               \n"
       . "[--private <private-list-id>]       \n"
+      . "[--error-mail-from <address>]       \n"
       . "[--verbose|-v]                      \n"
       . "[--help|-?]                         \n\n"
       . "Example:                            \n"
@@ -71,12 +72,13 @@ sub get_list_from_api {
 #
 
 # config parameters
-my ( $help, $user, $pass, $server, @private, $catchall );
+my ( $help, $user, $pass, $server, @private, $error_mf, $catchall );
 
 $user     = "";
 $pass     = "";
 $server   = "";
 @private  = ();
+$error_mf = "";
 $catchall = "";
 
 # parse commandline parameters
@@ -89,6 +91,7 @@ usage()
         'pass|p=s'    => \$pass,
         'host|h=s'    => \$server,
         'private:s'   => \@private,
+        'error-mail-from:s' => \$error_mf,
         'catch-all:s' => \$catchall,
     )
     or defined $help
@@ -119,9 +122,11 @@ foreach (@list) {
 
     $result .=
         "if\n  \$original_local_part is \"$_\""
-      . ( $_ ~~ @private ? " and \n  (\n$fromcheck\n  )" : "" )
+      . ( $_ ~~ @private ? "\nthen if\n  (\n$fromcheck\n  )" : "" )
       . "\nthen\n"
-      . "$deliver\nendif\n\n";
+      . "$deliver\n"
+      . ( $_ ~~ @private ? "else\n  seen mail to \$sender_address from \"$error_mf\" subject \"Re: \$header_subject\" text \"Die Email konnte nicht zugestellt werden, da Ihre Emailadresse für diesen Verteiler nicht freigeschaltet ist.\"\nendif\n" : "" )
+      . "endif\n\n";
 }
 
 if ( $catchall ne "" ) {
