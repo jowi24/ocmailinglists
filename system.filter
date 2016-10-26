@@ -1,0 +1,34 @@
+#
+# This is an example Exim system filter to be used in conjuncation with the ocmailinglists script
+#
+
+# modify mails going to mailing list domains
+if first_delivery and $recipients contains "@domain.com" 
+then
+
+  # add list name to subject, if only the list is in the to header (avoids adding this to replies)
+  headers add "Old-Subject: $h_subject"
+  if ${local_part:$recipients} is not ""
+  then
+    headers remove "Subject"
+    headers add "Subject: [${local_part:$recipients}] $h_old-subject"
+    headers remove "Old-Subject"
+  endif
+
+  # remove DKIM as we modify the header from
+  headers remove "DKIM-Signature"
+
+  # set reply to header, only if it was not set before
+  headers add "X-Reply-Address: $reply_address"
+  headers remove "Reply-To"
+  headers add "Reply-To: $h_x-reply-address"
+  headers remove "X-Reply-Address"
+
+  # set from header to a the local domains
+  headers add "X-Original-From: $h_from"
+  headers remove "From"
+  headers add "From: \"${sg{$header_x-original-from:}{\"}{}}\" <noreply@domain.com>"
+
+  # mark this mail as list mail
+  headers add "Precedence: list"
+endif
