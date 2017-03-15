@@ -40,13 +40,14 @@ sub http_get {
 
     # make request
     my $request = HTTP::Request->new( GET => $uri );
+    $request->header("OCS-APIRequest" => "true");
 
     # authenticate
     $request->authorization_basic( $user, $pass );
 
     # request data
     my $response = $ua->request($request);
-    die "Error " . $response->status_line unless $response->is_success;
+    die "Error " . $response->status_line . ": " . $response->content unless $response->is_success;
 
     # get content of response
     return $response->content();
